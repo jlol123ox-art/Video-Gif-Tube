@@ -1,0 +1,906 @@
+ <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Video Gif Tube — Video and Gif Website</title>
+<style>
+:root{
+  --bg:#0f1724; --panel:#0b1220; --muted:#9aa7c7; --accent:#6dd3ff;
+  --card:#0d1624; --glass: rgba(255,255,255,0.03);
+  --light-bg:#f5f5f5; --light-panel:#ffffff; --light-card:#e6eef8; --light-accent:#0099ff;
+}
+html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:
+  linear-gradient(180deg,#071226 0%, #03101a 100%);color:#e6eef8;transition:all 0.3s}
+body.light-mode{background:#f5f5f5;color:#0a0a0a}
+header{display:flex;align-items:center;gap:1rem;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.03)}
+header h1{margin:0;font-size:1.1rem;letter-spacing:0.4px}
+header .search{flex:1;display:flex;gap:.5rem;align-items:center}
+input,textarea,select,button{font:inherit}
+.btn{background:var(--accent);border:none;padding:.5rem .8rem;border-radius:8px;color:#042033;cursor:pointer;transition:all 0.2s}
+.btn:hover{opacity:0.85}
+.muted{color:var(--muted)}
+main{display:flex;gap:18px;padding:18px}
+.sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px;padding:12px;height:calc(100vh - 90px);box-sizing:border-box;overflow:auto}
+.content{flex:1;min-height:calc(100vh - 90px);overflow:auto}
+.card{background:var(--card);padding:12px;border-radius:10px;margin-bottom:12px;box-shadow: 0 6px 20px rgba(0,0,0,0.6);transition:all 0.3s}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,0,0,0.6)}
+.upload-area{border:2px dashed rgba(255,255,255,0.04);padding:12px;border-radius:8px;text-align:center}
+label.file{display:inline-block;padding:.4rem .6rem;border-radius:8px;background:var(--glass);cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.post{position:relative;border-radius:8px;overflow:hidden;background:#071727;transition:all 0.3s;cursor:default}
+.post:hover{transform:scale(1.02)}
+.post .media{display:block;width:100%;height:180px;object-fit:cover;background:#000;cursor:pointer;transition:all 0.3s}
+.post .meta{padding:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.small{font-size:.86rem}
+.like-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.like-btn.liked{color:#ff6b6b;font-weight:bold}
+.username{font-weight:600;color:var(--accent)}
+.login-box{display:flex;flex-direction:column;gap:8px}
+.input{padding:.6rem;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+footer{padding:14px;text-align:center;color:var(--muted);font-size:.85rem}
+.center{display:flex;align-items:center;justify-content:center}
+.pill{padding:.2rem .5rem;border-radius:999px;background:rgba(255,255,255,0.03);font-size:.85rem;cursor:pointer;user-select:none}
+.modal{position:fixed;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.7));display:none;align-items:center;justify-content:center;z-index:999}
+.modal.open{display:flex}
+.modal .sheet{width:min(1000px,96%);max-height:90vh;overflow:auto;background:linear-gradient(180deg,#071827,#051322);border-radius:12px;padding:12px;transition:all 0.3s}
+.comments{margin-top:12px}
+.comment{padding:.6rem;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px}
+.comment .replies{margin-left:12px;margin-top:6px}
+.small-muted{font-size:.8rem;color:var(--muted)}
+.profile-header{display:flex;gap:12px;align-items:center}
+.avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(90deg,#6dd3ff,#7b68ee);display:flex;align-items:center;justify-content:center;font-weight:700}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.danger{background:#ff6b6b;color:#fff}
+.ksmall{font-size:.86rem}
+.topbar-actions{display:flex;gap:.5rem;align-items:center}
+.meta .title{font-weight:700}
+.note{color:var(--muted);font-size:.86rem}
+.uploader-preview{max-height:250px;width:100%;object-fit:contain;margin-top:8px;border-radius:8px}
+.row{display:flex;gap:8px;align-items:center}
+.right{margin-left:auto}
+.empty{padding:3rem;text-align:center;color:var(--muted);border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+#settingsPanel{position:fixed;top:60px;right:20px;width:260px;background:var(--panel);padding:12px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5);display:none;flex-direction:column;gap:8px;z-index:999}
+#settingsPanel.show{display:flex}
+canvas#bgParticles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:0.28}
+.modalVideo{width:100%;height:auto;border-radius:8px;background:#000}
+.sideVideoList{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.sideVideo{display:flex;gap:8px;align-items:center;cursor:pointer}
+.sideVideo video{width:120px;height:70px;border-radius:8px;object-fit:cover}
+.comment input, .comment textarea{width:100%;margin-top:4px;margin-bottom:4px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.badge{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:999px;font-size:.8rem}
+
+/* Trending title glow */
+.trending-title{
+  font-weight:800;
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:8px;
+  background: linear-gradient(90deg, rgba(109,211,255,0.08), rgba(123,104,238,0.06));
+  box-shadow: 0 0 18px rgba(109,211,255,0.06), inset 0 1px 0 rgba(255,255,255,0.02);
+  color:var(--accent);
+  margin-bottom:8px;
+}
+.recent-title{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:6px;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+</style>
+</head>
+<body>
+<canvas id="bgParticles"></canvas>
+
+<header>
+  <h1>Video Gif Tube</h1>
+  <div class="search">
+    <input id="globalSearch" class="input" placeholder="Search posts, users, tags..." />
+    <button id="searchBtn" class="btn">Search</button>
+  </div>
+  <div class="topbar-actions">
+    <button id="themeToggle" class="btn">Dark/Light</button>
+    <button id="openSettings" class="btn">⚙️</button>
+    <div id="userArea" class="ksmall"></div>
+    <button id="openLogin" class="btn">Login / Register</button>
+  </div>
+</header>
+
+<div id="settingsPanel">
+  <div><label><input type="checkbox" id="toggleParticles"> Enable Background Particles</label></div>
+  <div><label><input type="checkbox" id="toggleHover"> Hover autoplay preview</label></div>
+</div>
+
+<main>
+  <aside class="sidebar">
+    <div class="card">
+      <div class="profile-header">
+        <div id="miniAvatar" class="avatar">G</div>
+        <div>
+          <div class="username" id="miniName">Guest</div>
+          <div class="small-muted" id="miniEmail">Not logged in</div>
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="controls">
+        <button id="goFeed" class="btn">Home</button>
+        <button id="goUpload" class="btn">Upload</button>
+        <button id="goProfile" class="btn">My Profile</button>
+        <button id="exportPosts" class="btn">Export My Posts</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="note">Upload quick GIFs or short MP4s. Files become posts. Keep files small (recommend < 6 MB).</div>
+      <hr>
+      <div class="small-muted">Filters</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <select id="filterSort" class="input">
+          <option value="new">Newest</option>
+          <option value="popular">Most liked</option>
+          <option value="views">Most viewed</option>
+          <option value="trending">Trending</option>
+        </select>
+        <select id="filterMine" class="input">
+          <option value="all">All</option>
+          <option value="mine">My posts</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+    <div class="card">
+      <div class="small-muted"></div>
+      <div class="note" style="margin-top:8px">
+      Video GIf Tube.
+      </div>
+    </div>
+  </aside>
+
+  <section class="content" id="contentArea">
+    <div id="feedPage" class="page">
+      <!-- Trending header -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="trending-title">🔥 Trending</div>
+            <div class="small-muted" style="margin-top:6px">Top posts right now</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="featuredCard" class="card">
+        <div id="featuredGrid" class="grid" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Recent Posts header -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="recent-title">🆕 Recent Posts</div>
+            <div class="small-muted" style="margin-top:6px">Newest uploads (all)</div>
+          </div>
+          <div class="row">
+            <input id="tagInput" class="input" placeholder="Tag to filter (optional)" />
+            <button id="applyFilter" class="btn">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="feedGrid" class="grid"></div>
+      <div id="feedEmpty" class="empty" style="display:none">No posts yet — upload one from the sidebar!</div>
+    </div>
+
+    <div id="uploadPage" class="page" style="display:none">
+      <div class="card">
+        <div class="title">Upload a GIF or short MP4</div>
+        <div class="upload-area" id="dropArea">
+          <div class="note">Drag & drop a GIF/MP4 here or</div>
+          <label class="file">Choose file<input id="fileInput" type="file" accept="image/gif,video/mp4" style="display:none"></label>
+          <div class="note" style="margin-top:8px">Add a title, description and tags (comma separated).</div>
+          <div style="margin-top:10px">
+            <input id="postTitle" class="input" placeholder="Title (required)" />
+            <textarea id="postDesc" class="input" rows="3" placeholder="Description (optional)"></textarea>
+            <input id="postTags" class="input" placeholder="Tags (comma separated)" />
+            <div style="margin-top:8px">
+              <button id="doUpload" class="btn">Upload</button>
+              <button id="clearUpload" class="btn">Clear</button>
+            </div>
+            <img id="uPreview" class="uploader-preview" style="display:none" />
+            <video id="vPreview" class="uploader-preview" style="display:none" controls></video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="profilePage" class="page" style="display:none">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="title">My Profile</div>
+            <div class="note" id="profileSub">Manage your posts & account</div>
+          </div>
+          <div>
+            <button id="logoutBtn" class="btn danger">Log out</button>
+            <button id="deleteAccount" class="btn danger">Delete Account</button>
+          </div>
+        </div>
+      </div>
+      <div id="myPosts" class="grid"></div>
+      <div id="profileEmpty" class="empty" style="display:none">You haven't uploaded anything yet.</div>
+    </div>
+  </section>
+</main>
+
+<footer>Video Gif Tube — Video and Gif Website.</footer>
+
+<!-- Post detail modal -->
+<div id="modal" class="modal"><div class="sheet">
+  <div style="display:flex;gap:12px">
+    <div style="flex:1">
+      <video id="modalVideo" class="modalVideo" controls></video>
+      <div style="margin-top:8px" class="small-muted">Views: <span id="modalViews">0</span></div>
+    </div>
+    <div style="width:360px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar" id="modalAvatar">U</div>
+        <div>
+          <div id="modalUser" class="username">User</div>
+          <div class="small-muted" id="modalTime">—</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="meta"><div class="title" id="modalTitle">Title</div></div>
+        <div class="note" id="modalDesc">Description</div>
+        <div style="margin-top:8px" class="row">
+          <button id="modalLike" class="like-btn">♡ <span id="modalLikes">0</span></button>
+          <button id="modalFav" class="btn">Pin</button>
+          <button id="modalWatchLater" class="btn">Watch Later</button>
+          <div class="right"><button id="modalClose" class="btn">Close</button></div>
+        </div>
+      </div>
+
+      <div class="comments" id="commentsSection">
+        <h4>Comments</h4>
+        <div id="commentsList"></div>
+        <div style="margin-top:8px">
+          <textarea id="commentText" class="input" rows="2" placeholder="Say something..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button id="postComment" class="btn">Post Comment</button>
+            <button id="refreshComments" class="btn">Refresh</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div></div>
+
+<!-- Login / Register modal -->
+<div id="loginModal" class="modal"><div class="sheet">
+  <div style="display:flex;gap:12px">
+    <div style="flex:1">
+      <h3>Login / Register</h3>
+      <div class="login-box">
+        <input id="authEmail" class="input" placeholder="username (unique)" />
+        <input id="authDisplay" class="input" placeholder="display name (optional)" />
+        <input id="authPass" class="input" placeholder="password" type="password" />
+        <div style="display:flex;gap:6px">
+          <button id="doRegister" class="btn">Register</button>
+          <button id="doLogin" class="btn">Login</button>
+          <button id="closeAuth" class="btn">Close</button>
+        </div>
+        <div id="authMsg" class="small-muted"></div>
+      </div>
+    </div>
+    <div style="width:280px">
+      <h4 class="small-muted">Accounts</h4>
+      <div id="accountsList" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
+    </div>
+  </div>
+</div></div>
+
+<script>
+/* ======================
+   Utilities & DB layer (same as before)
+   ====================== */
+
+/* Small safe HTML escape */
+function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* IndexedDB wrapper */
+const DB = (function(){
+  const DB_NAME = 'minigifftube_v1';
+  const DB_VERSION = 1;
+  let db;
+  function open(){
+    return new Promise((res,rej)=>{
+      if(db) return res(db);
+      const r = indexedDB.open(DB_NAME, DB_VERSION);
+      r.onupgradeneeded = (e) => {
+        const d = e.target.result;
+        if(!d.objectStoreNames.contains('users')) d.createObjectStore('users',{keyPath:'username'});
+        if(!d.objectStoreNames.contains('posts')) d.createObjectStore('posts',{keyPath:'id'});
+      };
+      r.onsuccess = ()=>{ db = r.result; res(db); };
+      r.onerror = ()=> rej(r.error);
+    });
+  }
+  function tx(store, mode='readonly'){ return open().then(d=> d.transaction(store, mode).objectStore(store)); }
+
+  return {
+    putUser: async (user) => {
+      const s = await tx('users','readwrite');
+      return new Promise((res,rej)=>{
+        const r = s.put(user);
+        r.onsuccess=()=>res(true);
+        r.onerror=()=>rej(r.error);
+      });
+    },
+    getUser: async (username)=> {
+      const s = await tx('users');
+      return new Promise((res,rej)=>{
+        const r = s.get(username);
+        r.onsuccess=()=>res(r.result);
+        r.onerror=()=>rej(r.error);
+      });
+    },
+    listUsers: async ()=> {
+      const s = await tx('users');
+      return new Promise((res,rej)=>{
+        const a=[];
+        const r = s.openCursor();
+        r.onsuccess = e => {
+          const c = e.target.result;
+          if(!c) return res(a);
+          a.push(c.value); c.continue();
+        };
+        r.onerror=()=>rej(r.error);
+      });
+    },
+    putPost: async (post)=> {
+      const s = await tx('posts','readwrite');
+      return new Promise((res,rej)=>{
+        const r = s.put(post);
+        r.onsuccess=()=>res(true);
+        r.onerror=()=>rej(r.error);
+      });
+    },
+    getPost: async (id)=> {
+      const s = await tx('posts');
+      return new Promise((res,rej)=>{
+        const r = s.get(id);
+        r.onsuccess=()=>res(r.result);
+        r.onerror=()=>rej(r.error);
+      });
+    },
+    listPosts: async ()=> {
+      const s = await tx('posts');
+      return new Promise((res,rej)=>{
+        const a=[];
+        const r = s.openCursor(null,'prev'); // newest first
+        r.onsuccess = e => {
+          const c = e.target.result;
+          if(!c) return res(a);
+          a.push(c.value); c.continue();
+        };
+        r.onerror=()=>rej(r.error);
+      });
+    },
+    deletePost: async (id)=> {
+      const s = await tx('posts','readwrite');
+      return new Promise((res,rej)=>{
+        const r = s.delete(id);
+        r.onsuccess=()=>res(true);
+        r.onerror=()=>rej(r.error);
+      });
+    }
+  };
+})();
+
+/* SHA-256 hash utility */
+async function sha256Hex(text){
+  const enc = new TextEncoder();
+  const data = enc.encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  const arr = Array.from(new Uint8Array(hash));
+  return arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ID generator */
+function uid(prefix='p'){ return prefix + Math.random().toString(36).slice(2,10); }
+
+/* timeAgo */
+function timeAgo(ts){
+  const diff = Date.now() - ts;
+  const sec = Math.floor(diff/1000);
+  if(sec<60) return sec+'s';
+  const m = Math.floor(sec/60);
+  if(m<60) return m+'m';
+  const h = Math.floor(m/60);
+  if(h<24) return h+'h';
+  const d = Math.floor(h/24);
+  return d+'d';
+}
+
+/* session */
+function setSession(username){ localStorage.setItem('mgt_session', username||''); }
+function getSession(){ return localStorage.getItem('mgt_session') || ''; }
+
+/* ===== App (keeps your previous logic + updated featured -> top5 + recent header) ===== */
+const App = (function(){
+  const els = {};
+  function cacheEls(){
+    const ids = ['globalSearch','searchBtn','openLogin','userArea','miniAvatar','miniName','miniEmail','goFeed','goUpload','goProfile','exportPosts',
+     'feedGrid','feedEmpty','uploadPage','feedPage','profilePage','myPosts','profileEmpty','fileInput','doUpload','postTitle','postDesc','postTags',
+     'uPreview','vPreview','dropArea','clearUpload','authEmail','authPass','authDisplay','doRegister','doLogin','closeAuth','loginModal','openLogin',
+     'accountsList','authMsg','modal','modalImg','modalVideo','modalUser','modalTime','modalTitle','modalDesc','modalLikes','modalViews','modalLike',
+     'commentsList','commentText','postComment','modalClose','modalOpenProfile','logoutBtn','deleteAccount','filterSort','filterMine','applyFilter','tagInput',
+     'searchBtn','feedGrid','feedEmpty','exportPosts','miniName','miniEmail','miniAvatar','userArea','goFeed','goUpload','goProfile',
+     'feedPage','uploadPage','profilePage','profilesub','feedGrid','profileEmpty','myPosts','feedEmpty','themeToggle','openSettings','settingsPanel',
+     'toggleParticles','featuredGrid','modal','commentsSection','commentsList','postComment','commentText','modalClose','modalVideo',
+     'modalFav','modalWatchLater','modalUser','modalAvatar','modalTime','modalTitle','modalDesc','modalViews','modalLike','applyFilter','tagInput'
+    ];
+    ids.forEach(id=>{ const el=document.getElementById(id); if(el) els[id]=el; });
+  }
+
+  function renderPostCard(post, forProfile=false){
+    const el = document.createElement('div');
+    el.className='post card';
+    el.style.padding = '0';
+    const mediaIsImg = post.type && post.type.startsWith('image/');
+    const mediaHtml = mediaIsImg
+      ? `<img loading="lazy" class="media" src="${post.data}" alt="${esc(post.title)}">`
+      : `<video class="media" preload="metadata" loop muted playsinline><source src="${post.data}" type="${post.type}"></video>`;
+    el.innerHTML = `
+      <div style="position:relative">${mediaHtml}</div>
+      <div class="meta">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="avatar">${esc(post.ownerDisplay ? post.ownerDisplay[0]?.toUpperCase() : (post.owner||'U')[0]||'U')}</div>
+          <div>
+            <div class="small ksmall">${esc(post.title || '(no title)')}</div>
+            <div class="small-muted">${esc(post.ownerDisplay || post.owner)} · ${timeAgo(post.created)}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <button class="like-btn ${ (post.likes||[]).includes(getSession()) ? 'liked':'' }" data-id="${post.id}">♡ <span>${post.likes?.length||0}</span></button>
+          <div style="height:6px"></div>
+          <button class="btn" data-open="${post.id}">Open</button>
+          <div style="height:6px"></div>
+          <button class="btn small favorite-btn" data-id="${post.id}">Pin</button>
+          <button class="btn small watchlater-btn" data-id="${post.id}">Watch</button>
+        </div>
+      </div>
+    `;
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('.like-btn') || e.target.closest('.favorite-btn') || e.target.closest('.watchlater-btn') || e.target.closest('button')) return;
+      openModal(post.id);
+    });
+
+    el.querySelectorAll('video.media').forEach(v=>{
+      v.addEventListener('mouseenter', ()=>{ if(settings.hoverPreview) { v.muted = true; v.play().catch(()=>{}); } });
+      v.addEventListener('mouseleave', ()=>{ if(settings.hoverPreview){ v.pause(); v.currentTime=0; } });
+      v.play().catch(()=>{});
+    });
+
+    el.querySelector('[data-open]')?.addEventListener('click', (ev)=>{ ev.stopPropagation(); openModal(post.id); });
+    el.querySelector('.like-btn')?.addEventListener('click', async (e)=>{ e.stopPropagation(); const id = e.currentTarget.dataset.id; await toggleLike(id); await refreshFeed(); });
+    el.querySelector('.favorite-btn')?.addEventListener('click', async (e)=>{ e.stopPropagation(); const id = e.currentTarget.dataset.id; await toggleFavorite(id); await refreshFeed(); });
+    el.querySelector('.watchlater-btn')?.addEventListener('click', async (e)=>{ e.stopPropagation(); const id = e.currentTarget.dataset.id; await toggleWatchLater(id); await refreshFeed(); });
+
+    el.addEventListener('contextmenu',(ev)=>{
+      ev.preventDefault();
+      if(getSession() && getSession() === post.owner){
+        if(confirm('Delete this post?')) {
+          DB.deletePost(post.id).then(()=> refreshFeed());
+        }
+      }
+    });
+    return el;
+  }
+
+  async function toggleLike(postId){
+    if(!getSession()){ alert('Please log in to like.'); return; }
+    const post = await DB.getPost(postId);
+    if(!post) return;
+    post.likes = post.likes || [];
+    const i = post.likes.indexOf(getSession());
+    if(i>=0) post.likes.splice(i,1); else post.likes.push(getSession());
+    await DB.putPost(post);
+  }
+
+  async function toggleFavorite(postId){
+    const cur = getSession();
+    if(!cur){ alert('Please log in to pin.'); return; }
+    const user = await DB.getUser(cur);
+    user.favorites = user.favorites || [];
+    const i = user.favorites.indexOf(postId);
+    if(i>=0) user.favorites.splice(i,1); else user.favorites.push(postId);
+    await DB.putUser(user);
+    await updateUIForSession();
+  }
+
+  async function toggleWatchLater(postId){
+    const cur = getSession();
+    if(!cur){ alert('Please log in to add watch later.'); return; }
+    const user = await DB.getUser(cur);
+    user.watchLater = user.watchLater || [];
+    const i = user.watchLater.indexOf(postId);
+    if(i>=0) user.watchLater.splice(i,1); else user.watchLater.push(postId);
+    await DB.putUser(user);
+    await updateUIForSession();
+  }
+
+  async function openModal(id){
+    const post = await DB.getPost(id);
+    if(!post) return;
+    post.views = (post.views||0) + 1;
+    await DB.putPost(post);
+
+    if(post.type && post.type.startsWith('image/')){
+      els.modalImg && (els.modalImg.style.display = '');
+      els.modalVideo && (els.modalVideo.style.display='none');
+      els.modalImg && (els.modalImg.src = post.data);
+    } else {
+      els.modalVideo && (els.modalVideo.style.display='');
+      els.modalImg && (els.modalImg.style.display='none');
+      els.modalVideo && (els.modalVideo.src = post.data);
+    }
+    els.modalUser.textContent = post.ownerDisplay || post.owner;
+    els.modalTime.textContent = timeAgo(post.created) + ' · ' + new Date(post.created).toLocaleString();
+    els.modalTitle.textContent = post.title || '(no title)';
+    els.modalDesc.innerHTML = esc(post.description || '');
+    els.modalLikes.textContent = post.likes?.length||0;
+    els.modalViews.textContent = post.views||0;
+    els.modalAvatar.textContent = (post.ownerDisplay||post.owner||'U')[0].toUpperCase();
+
+    renderComments(post);
+
+    const all = await DB.listPosts();
+    const side = all.filter(p=>p.id !== post.id).slice(0,6);
+    const rightCol = document.querySelector('#modal .sheet > div > div:nth-child(2)');
+    if(rightCol){
+      const prev = rightCol.querySelector('.sideVideoList');
+      if(prev) prev.remove();
+      const sideContainer = document.createElement('div'); sideContainer.className='sideVideoList';
+      side.forEach(s=>{
+        const d = document.createElement('div'); d.className='sideVideo';
+        d.innerHTML = `<video src="${s.data}" muted loop></video><div style="flex:1"><div class="small ksmall">${esc(s.title)}</div><div class="small-muted">${esc(s.ownerDisplay||s.owner)}</div></div>`;
+        d.addEventListener('click', ()=> openModal(s.id));
+        sideContainer.appendChild(d);
+      });
+      rightCol.appendChild(sideContainer);
+    }
+
+    els.modal.classList.add('open');
+
+    els.modalLike.onclick = async ()=>{ await toggleLike(post.id); const p = await DB.getPost(post.id); els.modalLikes.textContent = p.likes?.length||0; await refreshFeed(); };
+    els.modalFav.onclick = async ()=>{ await toggleFavorite(post.id); alert('Toggled favorite'); await updateUIForSession(); };
+    els.modalWatchLater.onclick = async ()=>{ await toggleWatchLater(post.id); alert('Toggled watch later'); await updateUIForSession(); };
+    els.modalClose.onclick = ()=> { els.modal.classList.remove('open'); els.modalVideo.pause(); };
+    els.postComment.onclick = async ()=>{ 
+      if(!getSession()){ alert('Please log in to comment.'); return; }
+      const text = els.commentText.value.trim(); if(!text) return;
+      post.comments = post.comments || [];
+      post.comments.push({id:uid('c'), user:getSession(), display: (await DB.getUser(getSession())).display || getSession(), text, created:Date.now(), likes:0, replies:[]});
+      await DB.putPost(post);
+      els.commentText.value='';
+      renderComments(post);
+    };
+    els.refreshComments.onclick = ()=> renderComments(post);
+    els.modalOpenProfile.onclick = ()=> { showProfile(post.owner); };
+  }
+
+  function renderComments(post){
+    const cont = document.getElementById('commentsList');
+    cont.innerHTML = '';
+    const list = (post.comments || []).slice().reverse();
+    if(list.length===0) cont.innerHTML = '<div class="small-muted">No comments yet</div>';
+    else{
+      list.forEach(c=>{
+        const d = document.createElement('div'); d.className='comment';
+        d.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${esc(c.display||c.user)}</strong> <span class="small-muted">${timeAgo(c.created)}</span></div>
+                       <div><button class="btn small" data-like="${esc(c.id)}">👍 <span>${c.likes||0}</span></button> <button class="btn small" data-reply="${esc(c.id)}">Reply</button></div></div>
+                       <div style="margin-top:6px">${esc(c.text)}</div>
+                       <div class="replies"></div>`;
+        cont.appendChild(d);
+
+        const repliesDiv = d.querySelector('.replies');
+        (c.replies || []).forEach(r=>{
+          const rd = document.createElement('div'); rd.className='comment'; rd.style.marginLeft='12px';
+          rd.innerHTML = `<div><strong>${esc(r.display||r.user)}</strong> <span class="small-muted">${timeAgo(r.created)}</span></div><div style="margin-top:6px">${esc(r.text)}</div>`;
+          repliesDiv.appendChild(rd);
+        });
+
+        const likeBtn = d.querySelector('[data-like]');
+        likeBtn.addEventListener('click', async ()=>{
+          if(!getSession()){ alert('Please log in to like comments.'); return; }
+          const postObj = post;
+          const cur = getSession();
+          const user = await DB.getUser(cur);
+          user.likedComments = user.likedComments || [];
+          if(user.likedComments.includes(c.id)){ alert('You already liked this'); return; }
+          c.likes = (c.likes||0) + 1;
+          user.likedComments.push(c.id);
+          await DB.putUser(user);
+          await DB.putPost(postObj);
+          renderComments(postObj);
+        });
+
+        const replyBtn = d.querySelector('[data-reply]');
+        replyBtn.addEventListener('click', async ()=>{
+          if(!getSession()){ alert('Please log in to reply.'); return; }
+          const txt = prompt('Write your reply:');
+          if(!txt) return;
+          c.replies = c.replies || [];
+          const user = await DB.getUser(getSession());
+          c.replies.push({id:uid('r'), user: getSession(), display: user.display||getSession(), text: txt, created: Date.now()});
+          await DB.putPost(post);
+          renderComments(post);
+        });
+      });
+    }
+  }
+
+  async function refreshAccountsList(){
+    const list = await DB.listUsers();
+    const cont = els.accountsList;
+    cont.innerHTML = '';
+    list.forEach(u=>{
+      const b = document.createElement('div'); b.className='pill'; b.textContent = `${u.username} (${u.display||'—'})`;
+      b.style.cursor='pointer';
+      b.onclick = ()=> { els.authEmail.value = u.username; els.authDisplay.value = u.display || ''; els.authMsg.textContent = 'Filled fields from selected account'; };
+      cont.appendChild(b);
+    });
+  }
+
+  async function doRegister(){
+    const name = (els.authEmail.value || '').trim();
+    const pass = (els.authPass && els.authPass.value) || '';
+    if(!name || !pass){ els.authMsg.textContent = 'Provide username and password'; return; }
+    const existing = await DB.getUser(name);
+    if(existing){ els.authMsg.textContent = 'Username already exists'; return; }
+    const hash = await sha256Hex(pass);
+    const display = (els.authDisplay.value||'').trim() || name;
+    const user = { username:name, display, passHash:hash, created:Date.now(), favorites:[], watchLater:[], likedComments:[], subscribed:[], subscribers:0 };
+    await DB.putUser(user);
+    els.authMsg.textContent = 'Registered — you can now log in';
+    await refreshAccountsList();
+  }
+
+  async function doLogin(){
+    const name = (els.authEmail.value||'').trim();
+    const pass = (els.authPass && els.authPass.value) || '';
+    if(!name || !pass){ els.authMsg.textContent = 'Provide username and password'; return; }
+    const user = await DB.getUser(name);
+    if(!user){ els.authMsg.textContent = 'Account not found'; return; }
+    const hash = await sha256Hex(pass);
+    if(hash !== user.passHash){ els.authMsg.textContent = 'Wrong password'; return; }
+    setSession(user.username);
+    els.authMsg.textContent = 'Logged in!';
+    els.loginModal.classList.remove('open');
+    await updateUIForSession();
+    await refreshFeed();
+  }
+
+  async function updateUIForSession(){
+    const cur = getSession();
+    if(!cur){
+      els.userArea.innerHTML = `<span class="note">Not logged in</span>`;
+      els.miniName.textContent = 'Guest';
+      els.miniEmail.textContent = 'Not logged in';
+      els.miniAvatar.textContent = 'G';
+    } else {
+      const u = await DB.getUser(cur);
+      els.userArea.innerHTML = `<span class="pill">${esc(u.display||u.username)}</span>`;
+      els.miniName.textContent = u.display || u.username;
+      els.miniEmail.textContent = u.username;
+      els.miniAvatar.textContent = (u.display||u.username)[0].toUpperCase();
+    }
+  }
+
+  let stagedFile = null;
+  function setupUploadHooks(){
+    const drop = document.getElementById('dropArea');
+    drop.addEventListener('dragover', (e)=>{ e.preventDefault(); drop.style.borderColor='#4dd'; });
+    drop.addEventListener('dragleave', (e)=>{ drop.style.borderColor=''; });
+    drop.addEventListener('drop', (e)=>{ e.preventDefault(); drop.style.borderColor=''; const f = e.dataTransfer.files?.[0]; if(f) handleFileSelect(f); });
+    const fi = document.getElementById('fileInput');
+    fi && fi.addEventListener('change', (e)=>{ const f = e.target.files?.[0]; if(f) handleFileSelect(f); });
+    const clearBtn = document.getElementById('clearUpload');
+    clearBtn && clearBtn.addEventListener('click', ()=>{ clearUpload(); });
+    const uploadBtn = document.getElementById('doUpload');
+    uploadBtn && uploadBtn.addEventListener('click', async ()=>{
+      if(!stagedFile){ alert('No file selected'); return; }
+      if(!getSession()){ if(!confirm('You are not logged in. Upload as "guest"?')) return; }
+      const title = (document.getElementById('postTitle').value||'Untitled').trim();
+      const desc = document.getElementById('postDesc').value||'';
+      const tags = (document.getElementById('postTags').value||'').split(',').map(t=>t.trim()).filter(Boolean);
+      const data = stagedFile.dataURL;
+      const post = {
+        id: uid('post'),
+        title, description:desc, tags, owner: getSession() || 'guest', ownerDisplay: getSession() ? (await DB.getUser(getSession())).display : 'Guest',
+        type: stagedFile.type, data, created: Date.now(), likes:[], comments:[], views:0
+      };
+      await DB.putPost(post);
+      alert('Uploaded!');
+      clearUpload();
+      await refreshFeed();
+    });
+  }
+  function handleFileSelect(file){
+    const maxMB = 20;
+    if(file.size > maxMB*1024*1024){ alert('File too large. Keep under ' + maxMB + ' MB.'); return; }
+    const t = file.type || (file.name.endsWith('.gif') ? 'image/gif' : 'video/mp4');
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      stagedFile = { dataURL: ev.target.result, name: file.name, type: t, size: file.size };
+      showPreview(stagedFile);
+    };
+    reader.readAsDataURL(file);
+  }
+  function showPreview(staged){
+    const up = document.getElementById('uPreview');
+    const vp = document.getElementById('vPreview');
+    if(staged.type && staged.type.startsWith('image/')){
+      up.src = staged.dataURL; up.style.display='block'; if(vp) vp.style.display='none';
+    } else {
+      vp.src = staged.dataURL; vp.style.display='block'; if(up) up.style.display='none';
+    }
+  }
+  function clearUpload(){ stagedFile=null; const up=document.getElementById('uPreview'); const vp=document.getElementById('vPreview'); if(up) up.style.display='none'; if(vp) vp.style.display='none'; const fi=document.getElementById('fileInput'); if(fi) fi.value=''; document.getElementById('postTitle').value=''; document.getElementById('postDesc').value=''; document.getElementById('postTags').value=''; }
+
+  function showPage(name){
+    ['feedPage','uploadPage','profilePage'].forEach(k=>{
+      const el = document.getElementById(k);
+      if(!el) return;
+      el.style.display = (k === name) ? '' : 'none';
+    });
+  }
+
+  async function showProfile(username){
+    if(!username) username = getSession();
+    if(!username){ alert('No profile to show'); return; }
+    showPage('profilePage');
+    const user = await DB.getUser(username);
+    document.getElementById('miniName').textContent = user ? user.display || user.username : username;
+    document.getElementById('profileSub').textContent = `Viewing ${username}'s posts`;
+    const all = await DB.listPosts();
+    const mine = all.filter(p=>p.owner === username);
+    const myPostsEl = document.getElementById('myPosts');
+    myPostsEl.innerHTML='';
+    if(mine.length===0) document.getElementById('profileEmpty').style.display='';
+    else document.getElementById('profileEmpty').style.display='none';
+    mine.forEach(p=> myPostsEl.appendChild(renderPostCard(p, true)));
+  }
+
+  async function exportMyPosts(){
+    const cur = getSession();
+    if(!cur){ alert('Log in to export your posts'); return; }
+    const all = await DB.listPosts();
+    const mine = all.filter(p=>p.owner === cur);
+    if(mine.length===0){ alert('No posts to export'); return; }
+    const rows = [ ['id','title','description','tags','likes','views','created'] ];
+    mine.forEach(p=> rows.push([p.id, p.title, p.description, (p.tags||[]).join('|'), (p.likes||[]).length, p.views||0, new Date(p.created).toISOString()]));
+    const csv = rows.map(r=> r.map(c=> '"'+String(c||'').replace(/"/g,'""') +'"').join(',')).join('\\n');
+    const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='my_posts.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+
+  async function deleteAccount(){
+    const cur = getSession();
+    if(!cur) return alert('Not logged in');
+    if(!confirm('Delete account and all your posts? This cannot be undone on this browser.')) return;
+    const me = await DB.getUser(cur);
+    if(me){ me.passHash = ''; me.display = '(deleted)'; await DB.putUser(me); }
+    const posts = await DB.listPosts();
+    for(const p of posts.filter(x=>x.owner===cur)) await DB.deletePost(p.id);
+    setSession('');
+    await updateUIForSession();
+    await refreshFeed();
+    alert('Account action completed.');
+  }
+
+  async function doSearch(){
+    const q = (document.getElementById('globalSearch').value || '').trim().toLowerCase();
+    const posts = await DB.listPosts();
+    const res = posts.filter(p=> (p.title||'').toLowerCase().includes(q) || (p.tags||[]).join(' ').toLowerCase().includes(q) || (p.owner||'').toLowerCase().includes(q));
+    const grid = document.getElementById('feedGrid');
+    grid.innerHTML = '';
+    if(res.length===0) document.getElementById('feedEmpty').style.display='';
+    else document.getElementById('feedEmpty').style.display='none';
+    res.forEach(p=> grid.appendChild(renderPostCard(p)));
+  }
+
+  async function renderFeatured(){
+    const all = await DB.listPosts();
+    const scored = all.map(p=> ({p, score: (p.likes?.length||0)*2 + (p.views||0)}));
+    scored.sort((a,b)=> b.score - a.score);
+    const top = scored.slice(0,5).map(s=> s.p); // top5 now
+    const container = document.getElementById('featuredGrid');
+    container.innerHTML='';
+    top.forEach(p=> container.appendChild(renderPostCard(p)));
+  }
+
+  async function refreshFeed(){
+    const all = await DB.listPosts();
+    const sort = (document.getElementById('filterSort') && document.getElementById('filterSort').value) || 'new';
+    const filterMine = (document.getElementById('filterMine') && document.getElementById('filterMine').value) || 'all';
+    const tagf = (document.getElementById('tagInput') && document.getElementById('tagInput').value.trim().toLowerCase()) || '';
+    let filtered = all.slice();
+
+    if(filterMine === 'mine' && getSession()) filtered = filtered.filter(p=>p.owner === getSession());
+    if(tagf) filtered = filtered.filter(p=> (p.tags||[]).map(t=>t.toLowerCase()).includes(tagf));
+    if(sort === 'popular') filtered.sort((a,b)=> (b.likes?.length||0) - (a.likes?.length||0));
+    if(sort === 'views') filtered.sort((a,b)=> (b.views||0) - (a.views||0));
+    if(sort === 'trending') filtered.sort((a,b)=> ((b.likes?.length||0)*2 + (b.views||0)) - ((a.likes?.length||0)*2 + (a.views||0)));
+    if(sort === 'new') filtered.sort((a,b)=> b.created - a.created);
+
+    const feedGrid = document.getElementById('feedGrid');
+    feedGrid.innerHTML = '';
+    if(filtered.length === 0) { document.getElementById('feedEmpty').style.display='block'; }
+    else { document.getElementById('feedEmpty').style.display='none'; }
+    // Recent posts = newest first (we already sorted above by 'new' when selected). We want all recent below featured.
+    filtered.forEach(p=> feedGrid.appendChild(renderPostCard(p)));
+    await renderFeatured();
+  }
+
+  async function init(){
+    cacheEls();
+
+    document.getElementById('openLogin').onclick = ()=> { document.getElementById('loginModal').classList.add('open'); refreshAccountsList(); };
+    document.getElementById('closeAuth').onclick = ()=> document.getElementById('loginModal').classList.remove('open');
+    document.getElementById('doRegister').onclick = doRegister;
+    document.getElementById('doLogin').onclick = doLogin;
+    document.getElementById('searchBtn').onclick = doSearch;
+    document.getElementById('goFeed').onclick = ()=> { showPage('feedPage'); refreshFeed(); };
+    document.getElementById('goUpload').onclick = ()=> { showPage('uploadPage'); };
+    document.getElementById('goProfile').onclick = ()=> { showPage('profilePage'); showProfile(getSession()); };
+    document.getElementById('exportPosts').onclick = exportMyPosts;
+    document.getElementById('logoutBtn') && (document.getElementById('logoutBtn').onclick = ()=>{ setSession(''); updateUIForSession(); refreshFeed(); });
+    document.getElementById('deleteAccount') && (document.getElementById('deleteAccount').onclick = deleteAccount);
+    document.getElementById('applyFilter') && (document.getElementById('applyFilter').onclick = refreshFeed);
+    document.getElementById('filterSort') && (document.getElementById('filterSort').onchange = refreshFeed);
+    document.getElementById('filterMine') && (document.getElementById('filterMine').onchange = refreshFeed);
+    document.getElementById('tagInput') && (document.getElementById('tagInput').onchange = refreshFeed);
+
+    document.getElementById('themeToggle').onclick = ()=>{
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('mgt_theme', document.body.classList.contains('light-mode') ? 'light':'dark');
+    };
+    if(localStorage.getItem('mgt_theme') === 'light') document.body.classList.add('light-mode');
+
+    document.getElementById('openSettings').onclick = ()=> document.getElementById('settingsPanel').classList.toggle('show');
+
+    const toggleParticles = document.getElementById('toggleParticles');
+    const canvas = document.getElementById('bgParticles'); const ctx = canvas.getContext('2d');
+    function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    let particles = [];
+    function initParticles(){ particles=[]; for(let i=0;i<120;i++) particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,dx:(Math.random()-0.5)*0.6,dy:(Math.random()-0.5)*0.6,r:Math.random()*2+0.8}); }
+    function drawParticles(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fill(); p.x+=p.dx; p.y+=p.dy; if(p.x<0||p.x>canvas.width)p.dx*=-1; if(p.y<0||p.y>canvas.height)p.dy*=-1; }); requestAnimationFrame(drawParticles); }
+    toggleParticles.onchange = e=>{ if(e.target.checked){ initParticles(); drawParticles(); } else { ctx.clearRect(0,0,canvas.width,canvas.height); } };
+
+    document.getElementById('toggleHover').onchange = (e)=> { settings.hoverPreview = !!e.target.checked; };
+
+    setupUploadHooks();
+    await updateUIForSession();
+    await refreshFeed();
+    const postsList = await DB.listPosts();
+    if(postsList.length === 0){
+      await refreshFeed();
+    }
+    await refreshAccountsList();
+  }
+
+  const settings = { hoverPreview: true };
+
+  return { init, showProfile, refreshFeed };
+})();
+
+/* Boot */
+(async function(){ await new Promise(r=>setTimeout(r,10)); await App.init(); })();
+</script>
+</body>
+</html>
